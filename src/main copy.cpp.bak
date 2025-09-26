@@ -1,0 +1,38 @@
+#include <Arduino.h>
+
+#define LED_PIN 2   // встроенный светодиод обычно на GPIO2
+#define PHOTO_PIN 34     // аналоговый вход для BPW34
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(115200);
+  Serial.println("Hello, ESP32!");
+}
+
+void loop() {
+  int sensorValue = analogRead(PHOTO_PIN);  // читаем свет
+  // Serial.print("Time: ");
+  // Serial.print(millis());
+  // Serial.print(" ms");
+  // Serial.print("  Light: ");
+  // Serial.println(sensorValue);
+
+  int adcValue = analogRead(PHOTO_PIN);
+  float voltage = adcValue * 3.3 / 4095.0;
+  Serial.println(voltage);
+
+  // Мигаем LED в зависимости от света
+  // if (sensorValue > 200) {  // порог можно подобрать опытным путём
+  //   digitalWrite(LED_PIN, HIGH);
+  // } else {
+  //   digitalWrite(LED_PIN, LOW);
+  // }
+
+  // digitalWrite(LED_PIN, HIGH);  // включить
+  // delay(500);                  // 1 секунда
+  // digitalWrite(LED_PIN, LOW);   // выключить
+  // Serial.print("Working... ");
+  // Serial.print(millis());
+  // Serial.println(" ms");
+  delay(100); 
+}
