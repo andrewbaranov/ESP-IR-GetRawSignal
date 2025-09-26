@@ -1,35 +1,26 @@
+// send IR signal
 #include <Arduino.h>
 #include <IRremoteESP8266.h>
-#include <IRrecv.h>
-#include <IRutils.h>
+#include <IRsend.h>
 
-#define RECV_PIN 27   // пин, к которому подключён OUT TSOP4838
+// Подключение ИК-светодиода через транзистор к D5 (GPIO14)
+const uint16_t kIrLedPin = 14; // D5 на ESP8266 = GPIO14
 
-IRrecv irrecv(RECV_PIN);
-decode_results results;
+IRsend irsend(kIrLedPin, 0, 56000);
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);  // задаём пин со светодиодом как выход
   Serial.begin(115200);
-  irrecv.enableIRIn();  // запускаем приёмник
-  Serial.println("IR receiver is ready...");
+  irsend.begin();
+  Serial.println("IR sender ready (D5 - GPIO14)");
 }
 
 void loop() {
-  if (irrecv.decode(&results)) {
-    // Выводим raw-данные
-    Serial.println("----  Income data");
-    Serial.printf("Raw data (%d):\n", results.rawlen);
-    for (uint16_t i = 1; i < results.rawlen; i++) {
-      unsigned int duration = results.rawbuf[i] * kRawTick; // kRawTick = 2.5 мкс
-      Serial.printf("%u ", duration);
-    }
-    Serial.println();
-    Serial.println("HEX code:");
-    Serial.println(resultToHumanReadableBasic(&results)); // Печатаем расшифровку
-    // Serial.println("Test:");
-    // serialPrintUint64(results.value, HEX);
-    // Serial.println("!!!!!");
+  digitalWrite(LED_BUILTIN, HIGH);
+  uint32_t necCode = 0x20DF10EF; // Пример NEC-кода (кнопка пульта)
+  Serial.printf("Отправка NEC кода: 0x%08X\n", necCode);
 
-    irrecv.resume(); // ждём следующий сигнал
-  }
+  irsend.sendNEC(necCode, 32);   // Отправка команды NEC (32 бита)
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(3000);                   // Повтор каждые 5 секунд
 }

@@ -1,0 +1,22 @@
+#include <Arduino.h>
+#include <IRrecv.h>
+#include <IRremoteESP8266.h>
+#include <IRutils.h>
+
+#define RECV_PIN 27   // Пин, куда подключён OUT TSOP4838
+
+IRrecv irrecv(RECV_PIN);      // Объект приёмника
+decode_results results;       // Структура для хранения результата
+
+void setup() {
+  Serial.begin(115200);
+  irrecv.enableIRIn();        // Запускаем приёмник
+  Serial.println("IR Receiver ready...");
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {    // Если пришёл сигнал
+    Serial.println(resultToHumanReadableBasic(&results)); // Печатаем расшифровку
+    irrecv.resume();   // Готовимся принимать следующий
+  }
+}
